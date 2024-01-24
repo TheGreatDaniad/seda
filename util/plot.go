@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"image/color"
 	"math"
 
@@ -21,7 +20,6 @@ func PlotFFT(sound []float64, sampleRate int, filename string) error {
 		amplitude := math.Sqrt(real(fftResult[i])*real(fftResult[i]) + imag(fftResult[i])*imag(fftResult[i]))
 		pts[i].Y = amplitude
 	}
-	fmt.Println(pts)
 
 	// Create a new plot
 	p := plot.New()
