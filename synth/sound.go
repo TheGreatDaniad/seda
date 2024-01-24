@@ -8,8 +8,8 @@ import (
 
 // sound harmonics amplitude of the previous and next 10 harmonics of a sound, value between 0-1
 type SoundHarmonics struct {
-	Next     [50]float64
-	Previous [50]float64
+	Next     [200]float64
+	Previous [200]float64
 }
 
 // ADSR represents the Attack, Decay, Sustain, and Release envelope parameters for a synthesizer.

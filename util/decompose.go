@@ -8,11 +8,11 @@ import (
 	"github.com/mjibson/go-dsp/fft"
 )
 
-func AnalyzeSound(sound []float64, sampleRate int) (float64, [50]float64, []struct {
+func AnalyzeSound(sound []float64, sampleRate int) (float64, [200]float64, []struct {
 	FrequencyRatio float64
 	MagnitudeRatio float64
 }, error) {
-	var harmonics [50]float64
+	var harmonics [200]float64
 
 	// Perform FFT
 	fftResult := fft.FFTReal(sound)
@@ -46,16 +46,16 @@ func AnalyzeSound(sound []float64, sampleRate int) (float64, [50]float64, []stru
 	fundamentalFreq := float64(fundamentalIndex) * float64(sampleRate) / float64(len(sound))
 
 	// Calculate the amplitudes of the next 10 harmonics
-	for i := 1; i <= 50; i++ { // Start from the second harmonic
-		startIndex := fundamentalIndex*i - 5
-		endIndex := fundamentalIndex*i + 5
+	for i := 1; i <= 200; i++ { // Start from the second harmonic
+		startIndex := fundamentalIndex*i - 500
+		endIndex := fundamentalIndex*i + 500
 		harmonicAmplitude := findPeakAmplitude(startIndex, endIndex)
 		harmonics[i-1] = harmonicAmplitude / fundamentalAmplitude // Normalize by fundamental amplitude
 	}
 
 	topFreqs, err := TopFrequencies(fundamentalFreq, fftResult, sampleRate)
 	if err != nil {
-		return 0, [50]float64{}, nil, err
+		return 0, [200]float64{}, nil, err
 	}
 
 	return fundamentalFreq, harmonics, topFreqs, nil
@@ -87,8 +87,10 @@ func TopFrequencies(fundamentalFreq float64, fftResult []complex128, sampleRate 
 	// Add other frequencies within the specified range
 	for i := range fftResult {
 		frequency := float64(i) * float64(sampleRate) / float64(len(fftResult))
-
-		if frequency >= 20 && frequency <= 20000 && frequency != fundamentalFreq {
+		if isDivisible(frequency, fundamentalFreq) {
+			continue
+		}
+		if frequency >= 200 && frequency <= 20000 && frequency != fundamentalFreq {
 
 			magnitude := math.Sqrt(real(fftResult[i])*real(fftResult[i]) + imag(fftResult[i])*imag(fftResult[i]))
 			freqMagnitudes = append(freqMagnitudes, FrequencyMagnitude{Frequency: frequency, Magnitude: magnitude})
@@ -105,8 +107,8 @@ func TopFrequencies(fundamentalFreq float64, fftResult []complex128, sampleRate 
 	})
 
 	numTopFreqs := len(freqMagnitudes)
-	if numTopFreqs > 2000 {
-		numTopFreqs = 2000
+	if numTopFreqs > 0 {
+		numTopFreqs = 0
 	}
 
 	// Select top frequencies and calculate ratios

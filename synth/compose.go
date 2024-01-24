@@ -48,7 +48,7 @@ func ComposeSound(fundamentalFreq float64, soundChar SoundCharacter, topFreqs []
 	// 	sound[i] = math.Sin(2 * math.Pi * fundamentalFreq * float64(i) / float64(sampleRate))
 	// }
 
-	addHarmonics := func(harmonics [50]float64, harmonicType string) {
+	addHarmonics := func(harmonics [200]float64, harmonicType string) {
 		for i, amp := range harmonics {
 			harmonicFreq := fundamentalFreq * float64(i+1)
 			if harmonicType == "previous" {
