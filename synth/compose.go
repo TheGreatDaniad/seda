@@ -1,7 +1,9 @@
 package synth
 
 import (
+	"fmt"
 	"math"
+	"time"
 )
 
 // ... [SoundHarmonics, ADSR, SoundCharacter type definitions as before] ...
@@ -39,14 +41,13 @@ func ComposeSound(fundamentalFreq float64, soundChar SoundCharacter, sampleRate 
 	numSamples := int(duration * float64(sampleRate))
 	sound := make([]float64, numSamples)
 
-	// Generate base sine wave for the fundamental frequency
-	for i := range sound {
-		sound[i] = math.Sin(2 * math.Pi * fundamentalFreq * float64(i) / float64(sampleRate))
-	}
+	// for i := range sound {
+	// 	sound[i] = math.Sin(2 * math.Pi * fundamentalFreq * float64(i) / float64(sampleRate))
+	// }
 
-	// Add harmonics
-	addHarmonics := func(harmonics [10]float32, harmonicType string) {
+	addHarmonics := func(harmonics [50]float64, harmonicType string) {
 		for i, amp := range harmonics {
+			t1 := time.Now()
 			harmonicFreq := fundamentalFreq * float64(i+1)
 			if harmonicType == "previous" {
 				harmonicFreq = fundamentalFreq / float64(i+1)
@@ -54,11 +55,13 @@ func ComposeSound(fundamentalFreq float64, soundChar SoundCharacter, sampleRate 
 			for j := range sound {
 				sound[j] += float64(amp) * math.Sin(2*math.Pi*harmonicFreq*float64(j)/float64(sampleRate))
 			}
+			fmt.Println(time.Since(t1))
 		}
+		fmt.Println(len(sound))
 	}
 
 	addHarmonics(soundChar.Harmonics.Next, "next")
-	addHarmonics(soundChar.Harmonics.Previous, "previous")
+	// addHarmonics(soundChar.Harmonics.Previous, "previous")
 
 	// Normalize the sound to prevent clipping
 	maxAmplitude := 0.0
